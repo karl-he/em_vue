@@ -1,10 +1,13 @@
 package com.baizhi.entity;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 import java.io.Serializable;
 import java.util.Date;
 
 public class User implements Serializable {
-    private int id;
+    private String id;
     private String username;
     private String realname;
     private String password;
@@ -12,11 +15,11 @@ public class User implements Serializable {
     private String status;
     private Date registertime;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

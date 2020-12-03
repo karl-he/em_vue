@@ -8,12 +8,13 @@
 </head>
 <body>
 <div id="app">
-    用户名：<input type="text"><br/>
-    真实姓名：<input type="password"><br/>
-    密码：<input type="password"><br/>
-    性别：<input type="radio" name="sex" value="男">男<input type="radio" name="sex" value="女">女<br/>
-    验证码：<input type="text"><img :src="url"><a @click="changeIme">换一张</a><br/>
-    <button>注册</button>
+    用户名：<input type="text" v-model="user.username"><br/>
+    真实姓名：<input type="text" v-model="user.realname"><br/>
+    密码：<input type="password" v-model="user.password"><br/>
+    性别：<input type="radio" name="sex" value="男" v-model="user.sex">男
+         <input type="radio" name="sex" value="女" v-model="user.sex">女<br/>
+    验证码：<input type="text" v-model="code"><img :src="url"><a @click="changeIme">换一张</a><br/>
+    <button @click="register">注册</button>
 </div>
 
 </body>
@@ -21,7 +22,11 @@
     var app = new Vue({
         el: '#app',
         data: {
-            url: ''
+            url: '',
+            user: {
+                sex: '男'
+            },
+            code: ''
         },
         created(){
            this.changeIme();
@@ -30,9 +35,22 @@
             changeIme(){
                 var _this = this;
                 axios.get("http://localhost:8989/ems_vue/user/getImage").then( res => {
-                    console.log(res.data);
                     _this.url = res.data;
                 })
+            },
+            register(){
+                if(this.code === ''){
+                    alert("请输入图形验证码");
+                }else{
+                    axios.post("http://localhost:8989/ems_vue/user/register?code=" + this.code,this.user).then(res => {
+                        if(res.data.status){
+                            alert(res.data.msg+'请登陆');
+                            location.href='/ems_vue/login.html';
+                        }else{
+                            alert(res.data.msg);
+                        }
+                    })
+                }
             }
         }
     });

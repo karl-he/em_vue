@@ -3,12 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="/ems_vue/js/vue.js"></script>
+    <script src="/ems_vue/js/axios.min.js"></script>
 </head>
 <body>
-<div>
-    用户名：<input type="text"><br/>
-    密码：<input type="password"><br/>
-    <button>登陆</button>
+<div id="login">
+    用户名：<input type="text" v-model="user.username"><br/>
+    密码：<input type="password" v-model="user.password"><br/>
+    <button @click="login">登陆</button>
 </div>
 </body>
+<script>
+    var login = new Vue({
+        el: "#login",
+        data:{
+            user:{}
+        },
+        methods:{
+            login(){
+                axios.post("http://localhost:8989/ems_vue/user/login",this.user).then(res => {
+                    if(res.status){
+                        alert(res.data.msg);
+                        location.href = "/ems_vue/List.html";
+                    }else{
+                        alert(res.data.msg)
+                    }
+                });
+            }
+        }
+    });
+</script>
 </html>
