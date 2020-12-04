@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/ems_vue/js/vue.js"></script>
+    <script src="/ems_vue/js/axios.min.js"></script>
+</head>
+<body>
+<div id="list">
+    <div>当前用户：{{user.realname}}</div>
+    <button @click="addEmp">新增</button>
+    <div><button @click="loginout">安全退出</button></div>
+    <table border="1">
+        <tr>
+            <td>编号</td>
+            <td>姓名</td>
+            <td>头像</td>
+            <td>工资</td>
+            <td>年龄</td>
+            <td>操作</td>
+        </tr>
+        <tr v-for="(item,index) in list" :key="item.id" :class="index%2==0?'row1':'row2'">
+            <td>{{item.id}}</td>
+            <td>{{item.name}}</td>
+            <td><img :src="'/ems_vue/'+item.path"></td>
+            <td>{{item.salary}}</td>
+            <td>{{item.age}}</td>
+            <td>
+                <button>修改</button>
+                <button>删除</button>
+            </td>
+        </tr>
+    </table>
+    <!--遮罩层-->
+    <div id="popContainer" v-show="addFlag">
+        <div class="addEmp">
+            <p>添加用户</p>
+            用户名：<input type="text" v-model="emp.name"><br/>
+            头像：<input type="file" ref="myPhoto"/><br/>
+            工资：<input type="text" v-model="emp.salary"><br/>
+            年龄：<input type="text" v-model="emp.age">
+        </div>
+        <button @click="goAddEmp">确定</button>
+        <button @click="cancel">重置</button>
+        <button @click="cancel">取消</button>
+    </div>
+
+
+</div>
+</body>
+<script>
+    var list = new Vue({
+        el: "#list",
+        data: {
+            user: {
+                realname: ""
+            },
+            emp: {},
+            list: [],
+            addFlag: false
+        },
+        created(){
+            //this.getUser();
+            this.findAll();
+        },
+        methods: {
+            //查询列表
+            findAll(){
+                var _this = this;
+                axios.get("http://localhost:8989/ems_vue/emp/findAll").then(res => {
+                    //console.log(res.data);
+                    _this.list = res.data;
+                });
+            },
+            //获取当前用户
+            getUser(){
+              var userString = localStorage.getItem("user");
+              if(userString){
+                  var user = JSON.parse(userString);
+                  this.user.realname = user.realname;
+              }else{
+                  alert("请先登陆");
+                  location.href = "/ems_vue/login.html";
+              }
+            },
+            //安全退出
+            loginout(){
+                localStorage.removeItem("user");
+                location.reload(true);
+            },
+            //添加员工
+            addEmp(){
+                this.addFlag = !this.addFlag;
+            },
+            goAddEmp(){
+                console.log(this.emp);
+                console.log(this.$refs.myPhoto.files[0]);
+                var formData = new FormData();
+                formData.append("name",this.emp.name);
+                formData.append("salary",this.emp.salary);
+                formData.append("age",this.emp.age);
+                formData.append("photo",this.$refs.myPhoto.files[0]);
+                axios({
+                    method:"post",
+                    url: "http://localhost:8989/ems_vue/emp/save",
+                    data: formData,
+                    headers:{
+                        "content-type":"multipart/form-data"
+                    }
+                }).then(res => {
+                    console.log(res.data);
+                })
+            },
+            cancel(){
+                this.addFlag = !this.addFlag;
+            }
+
+        }
+
+    });
+</script>
+<style>
+    .row1{
+        background-color: aliceblue;
+    }
+    .row2{
+        background-color: gainsboro;
+    }
+    #popContainer{
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        /*在设置透明度时
+        opacity: 0.6;
+        */
+        background-color: rgba(0,0,0,0.4);
+    }
+    .addEmp{
+        width: 400px;
+        height: 165px;
+        background-color: aliceblue;
+        text-align: center;
+        margin-top: 100px;
+        margin-left: 100px;
+    }
+    table img{
+        width: 60px;
+        height: 40px;
+    }
+</style>
+</html>

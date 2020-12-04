@@ -24,6 +24,7 @@
                 axios.post("http://localhost:8989/ems_vue/user/login",this.user).then(res => {
                     if(res.status){
                         alert(res.data.msg);
+                        localStorage.setItem("user",JSON.stringify(res.data.user))
                         location.href = "/ems_vue/List.html";
                     }else{
                         alert(res.data.msg)

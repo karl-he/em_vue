@@ -68,6 +68,7 @@ public class UserController {
             map.put("status",false);
             map.put("msg","用户名或密码不正确");
         }else{
+            map.put("user",loginUser);
             map.put("msg","登陆成功");
         }
         return map;
